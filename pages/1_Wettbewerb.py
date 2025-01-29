@@ -1,20 +1,20 @@
 import streamlit as st
 import json
 
-def speichern_wettbewerb(wettbewerbsname, datum, teilnehmer, disziplin):
+def speichern_wettbewerb(wettbewerbsname, datum, distanz, disziplin):
     """Speichert die Wettkampfdaten in einer JSON-Datei.
 
     Args:
         wettbewerbsname: Der Name des Wettbewerbs.
         datum: Das Datum des Wettbewerbs.
-        teilnehmer: Eine kommagetrennte Liste der Teilnehmer.
+        distanz: 10m, 25m, 50m.
         disziplin: Die Disziplin des Wettbewerbs.
     """
 
     data = {
         "wettbewerbsname": wettbewerbsname,
         "datum": str(datum),
-        "teilnehmer": teilnehmer.split(','),
+        "distanz": distanz,
         "disziplin": disziplin
     }
 
@@ -46,12 +46,12 @@ st.write("Eingabe des Wettbewerbs")
 # Eingabefelder
 wettbewerbsname = st.text_input("Wettbewerbsname")
 datum = st.date_input("Datum")
-teilnehmer = st.text_area("Teilnehmer (kommagetrennt)")
+distanz = st.selectbox("Distanz", ["10m", "25m", "50m"])
 disziplin = st.selectbox("Disziplin", ["Unterhebel", "KK", "Luftgewehr"])
 
 # Button zum Speichern
 if st.button("Wettbewerb speichern"):
-    speichern_wettbewerb(wettbewerbsname, datum, teilnehmer, disziplin)
+    speichern_wettbewerb(wettbewerbsname, datum, distanz, disziplin)
 
 # Button zum Anzeigen
 if st.button("Wettbewerbe anzeigen"):
@@ -60,7 +60,7 @@ if st.button("Wettbewerbe anzeigen"):
         for wettbewerb in wettbewerbe:
             st.write(f"Wettbewerb: {wettbewerb['wettbewerbsname']}")
             st.write(f"Datum: {wettbewerb['datum']}")
-            st.write(f"Teilnehmer: {', '.join(wettbewerb['teilnehmer'])}")
+            st.write(f"Distanz: {wettbewerb['distanz']}")
             st.write(f"Disziplin: {wettbewerb['disziplin']}")
     else:
         st.write("Keine Wettbewerbe gespeichert.")
