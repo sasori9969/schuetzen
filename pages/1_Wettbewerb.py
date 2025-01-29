@@ -39,23 +39,26 @@ def anzeigen_wettbewerbe():
     return []
 
 def loesche_wettbewerb(index):
-    """Löscht einen Wettkampf aus der JSON-Datei.
-
-    Args:
-        index: Der Index des zu löschenden Wettbewerbs.
-    """
-
     try:
         with open('wettbewerbe.json', 'r+') as f:
             data = json.load(f)
-            del data[index]
-            f.seek(0)
-            json.dump(data, f, indent=2)
-            f.truncate()
-        st.success("Wettbewerb erfolgreich gelöscht!")
-    except (IOError, OSError, IndexError) as e:
+            if 0 <= index < len(data):
+                del data[index]
+                f.seek(0)
+                json.dump(data, f, indent=2)
+                f.truncate()
+                # Debug: Print the updated data to the console
+                print("Updated data:", data)
+                st.success("Wettbewerb erfolgreich gelöscht!")
+            else:
+                st.error("Ungültiger Index.")
+    except (IOError, OSError) as e:
         st.error(f"Fehler beim Löschen des Wettbewerbs: {e}")
-
+    except json.JSONDecodeError as e:
+        st.error(f"Fehler beim Parsen der JSON-Datei: {e}")
+    # Force a re-render of the Streamlit app
+    st.experimental_rerun()
+    
 def anzeigen_wettbewerbe_mit_kaechen():
     """Zeigt alle gespeicherten Wettbewerbe in einer Kachelansicht an."""
     wettbewerbe = anzeigen_wettbewerbe()
