@@ -15,3 +15,13 @@ disziplin = st.selectbox("Disziplin", ["Unterhebel", "KK", "Luftgewehr"])
 if st.button("Wettbewerb speichern"):
     # Hier würde der Code zum Speichern in der Datenbank stehen
     st.success("Wettbewerb erfolgreich gespeichert!")
+
+    # Simulierte Datenbank (in einer echten Anwendung würdest du hier eine Datenbankverbindung herstellen)
+gespeicherte_wettbewerbe = [
+     {"name": "Sommerfest-Turnier", "datum": "2023-07-15", "disziplin": "Fußball"},
+     {"name": "Volleyball-Cup", "datum": "2023-09-02", "disziplin": "Volleyball"}
+]
+     # Anzeige der gespeicherten Wettbewerbe
+st.header("Gespeicherte Wettbewerbe")
+for wettbewerb in gespeicherte_wettbewerbe:
+    st.write(f"**{wettbewerb['name']}** - {wettbewerb['datum']} ({wettbewerb['disziplin']})")
