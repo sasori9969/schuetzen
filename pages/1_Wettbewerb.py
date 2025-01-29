@@ -7,7 +7,7 @@ st.write("Wettbewerb")
 # Erstelle die Texteingabefelder und speichere die Labels separat
 wettbewerb = st.text_input("Wettbewerb:")
 disziplin = st.text_input("Disziplin:")
-distanz = st.text_input("Distanz:")
+distanz = st.selectbox("Distanz:", ["10m", "25m", "50m"])
 datum = st.date_input("Datum:")
 
 # Liste der Labels
