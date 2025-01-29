@@ -1,119 +1,55 @@
 import streamlit as st
 import json
 
-def speichern_wettbewerb(wettbewerb):
-    """Speichert den Wettkampf in einer JSON-Datei.
+st.title("SSV 1928 e.V. Sulzbach")
+st.write("Wettbewerb")
 
-    Args:
-        wettbewerb: Ein Wörterbuch mit den Wettkampfdaten.
-    """
+# Erstelle die Texteingabefelder und speichere die Labels separat
+wettbewerb = st.text_input("Wettbewerb:")
+disziplin = st.text_input("Disziplin:")
+distanz = st.text_input("Distanz:")
+datum = st.date_input("Datum:")
 
+# Liste der Labels
+spalten_ueberschriften = ["Wettbewerb", "Disziplin", "Distanz", "Datum"]
+
+# Leere Liste zum Speichern der Daten
+data_list = []
+
+def speichern():
+    # Erstelle ein Python-Dictionary mit den eingegebenen Daten
     data = {
-        "wettbewerbsname": wettbewerbsname,
-        "datum": str(datum),
-        "distanz": distanz,
-        "disziplin": disziplin
+        "Wettbewerb": wettbewerb,
+        "Disziplin": disziplin,
+        "Distanz": distanz,
+        "Datum": str(datum)
     }
 
-    try:
-        with open('wettbewerbe.json', 'r+') as f:
-            try:
-                data = json.load(f)
-            except json.JSONDecodeError:
-                data = []
-            data.append(wettbewerb)
-            f.seek(0)
-            json.dump(data, f, indent=2)
-            f.truncate()
-    except (IOError, OSError) as e:
-        st.error(f"Fehler beim Speichern des Wettbewerbs: {e}")
+    # Füge das Dictionary zur Liste hinzu
+    data_list.append(data)
 
-def anzeigen_wettbewerbe():
-    """Zeigt alle gespeicherten Wettbewerbe an."""
-    try:
-        with open('wettbewerbe.json', 'r') as f:
-            data = json.load(f)
-            return data
-    except (IOError, OSError) as e:
-        st.error(f"Fehler beim Laden der Daten: {e}")
-    return []
+    # Speichere die gesamte Liste als JSON-Datei
+    with open("wettbewerbe.json", "w") as f:
+        json.dump(data_list, f)
 
-def loesche_wettbewerb(index):
-    try:
-        with open('wettbewerbe.json', 'r+') as f:
-            data = json.load(f)
-            if 0 <= index < len(data):
-                del data[index]
-                f.seek(0)
-                json.dump(data, f, indent=2)
-                f.truncate()
-                # Debug: Print the updated data to the console
-                print("Updated data:", data)
-                st.success("Wettbewerb erfolgreich gelöscht!")
-            else:
-                st.error("Ungültiger Index.")
-    except (IOError, OSError) as e:
-        st.error(f"Fehler beim Löschen des Wettbewerbs: {e}")
-    except json.JSONDecodeError as e:
-        st.error(f"Fehler beim Parsen der JSON-Datei: {e}")
-    # Force a re-render of the Streamlit app
-    st.experimental_rerun()
-    
-def anzeigen_wettbewerbe_mit_kaechen():
-    """Zeigt alle gespeicherten Wettbewerbe in einer Kachelansicht an."""
-    wettbewerbe = anzeigen_wettbewerbe()
-    if wettbewerbe:
-        col1, col2, col3 = st.columns(3)  # Anpassbar an die gewünschte Anzahl von Spalten
-
-        with st.container():
-            st.html("""
-            <style>
-                .stContainer {
-                    border: 1px solid #ccc;
-                    padding: 10px;
-                    margin: 10px;
-                    border-radius: 5px;
-                    background-color: #f9f9f9;
-                }
-            </style>
-            """)
-
-        for i, wettbewerb in enumerate(wettbewerbe):
-            with st.container():
-                st.markdown(f"### Wettkampf {i+1}")
-                st.write(f"**Name:** {wettbewerb['wettbewerbsname']}")
-                st.write(f"**Datum:** {wettbewerb['datum']}")
-                st.write(f"**Distanz:** {wettbewerb['distanz']}")
-                st.write(f"**Disziplin:** {wettbewerb['disziplin']}")
-
-                # Button zum Löschen
-                if st.button("Löschen", key=f"delete_{i}"):
-                    if st.button("Bestätigen?"):
-                        loesche_wettbewerb(i)
-                        st.experimental_rerun()  # Aktualisiert die Seite
-    else:
-        st.write("Keine Wettbewerbe gespeichert.")
-
-# Streamlit-App
-st.title("SSV 1928 e.V. Sulzbach")
-st.write("Eingabe des Wettbewerbs")
-
-# Eingabefelder
-wettbewerbsname = st.text_input("Wettbewerbsname")
-datum = st.date_input("Datum")
-distanz = st.selectbox("Distanz", ["10m", "25m", "50m"])
-disziplin = st.selectbox("Disziplin", ["Unterhebel", "KK", "Luftgewehr"])
+    st.success("Daten erfolgreich gespeichert!")
 
 # Button zum Speichern
-if st.button("Wettbewerb speichern"):
-    wettbewerb = {
-        "wettbewerbsname": wettbewerbsname,
-        "datum": str(datum),
-        "distanz": distanz,
-        "disziplin": disziplin
-    }
-    speichern_wettbewerb(wettbewerb)
+st.button("Speichern", on_click=speichern)
 
-# Button zum Anzeigen
-if st.button("Wettbewerbe anzeigen (Kacheln)"):
-    anzeigen_wettbewerbe_mit_kaechen()
+def lade_daten():
+    try:
+        with open("wettbewerbe.json", "r") as f:
+            global data_list
+            data_list = json.load(f)
+    except FileNotFoundError:
+        data_list = []
+
+    # Erstelle eine Liste von Listen, wobei jede innere Liste eine Zeile der Tabelle darstellt
+    data = [[d[col] for col in spalten_ueberschriften] for d in data_list]
+
+    # Zeige die Tabelle an
+    st.table(data)
+
+# Rufe die Funktion zum Laden der Daten beim ersten Laden der App auf
+lade_daten()
