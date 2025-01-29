@@ -1,14 +1,11 @@
 import streamlit as st
 import json
 
-def speichern_wettbewerb(wettbewerbsname, datum, distanz, disziplin):
-    """Speichert die Wettkampfdaten in einer JSON-Datei.
+def speichern_wettbewerb(wettbewerb):
+    """Speichert den Wettkampf in einer JSON-Datei.
 
     Args:
-        wettbewerbsname: Der Name des Wettbewerbs.
-        datum: Das Datum des Wettbewerbs.
-        distanz: 10m, 25m, 50m.
-        disziplin: Die Disziplin des Wettbewerbs.
+        wettbewerb: Ein Wörterbuch mit den Wettkampfdaten.
     """
 
     data = {
@@ -19,25 +16,80 @@ def speichern_wettbewerb(wettbewerbsname, datum, distanz, disziplin):
     }
 
     try:
-        with open('wettbewerbe.json', 'a') as f:
-            json.dump(data, f)
-            f.write('\n')
+        with open('wettbewerbe.json', 'r+') as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = []
+            data.append(wettbewerb)
+            f.seek(0)
+            json.dump(data, f, indent=2)
+            f.truncate()
     except (IOError, OSError) as e:
-        st.error(f"Fehler beim Speichern: {e}")
-    except json.JSONEncodeError as e:
-        st.error(f"Fehler bei der JSON-Codierung: {e}")
+        st.error(f"Fehler beim Speichern des Wettbewerbs: {e}")
 
 def anzeigen_wettbewerbe():
     """Zeigt alle gespeicherten Wettbewerbe an."""
     try:
         with open('wettbewerbe.json', 'r') as f:
-            data = []
-            for line in f:
-                data.append(json.loads(line))
+            data = json.load(f)
             return data
     except (IOError, OSError) as e:
         st.error(f"Fehler beim Laden der Daten: {e}")
     return []
+
+def loesche_wettbewerb(index):
+    """Löscht einen Wettkampf aus der JSON-Datei.
+
+    Args:
+        index: Der Index des zu löschenden Wettbewerbs.
+    """
+
+    try:
+        with open('wettbewerbe.json', 'r+') as f:
+            data = json.load(f)
+            del data[index]
+            f.seek(0)
+            json.dump(data, f, indent=2)
+            f.truncate()
+        st.success("Wettbewerb erfolgreich gelöscht!")
+    except (IOError, OSError, IndexError) as e:
+        st.error(f"Fehler beim Löschen des Wettbewerbs: {e}")
+
+def anzeigen_wettbewerbe_mit_kaechen():
+    """Zeigt alle gespeicherten Wettbewerbe in einer Kachelansicht an."""
+    wettbewerbe = anzeigen_wettbewerbe()
+    if wettbewerbe:
+        col1, col2, col3 = st.columns(3)  # Anpassbar an die gewünschte Anzahl von Spalten
+
+        with st.container():
+            st.html("""
+            <style>
+                .stContainer {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                    margin: 10px;
+                    border-radius: 5px;
+                    background-color: #f9f9f9;
+                }
+            </style>
+            """)
+
+        for i, wettbewerb in enumerate(wettbewerbe):
+            with st.container():
+                st.markdown(f"### Wettkampf {i+1}")
+                st.write(f"**Name:** {wettbewerb['wettbewerbsname']}")
+                st.write(f"**Datum:** {wettbewerb['datum']}")
+                st.write(f"**Distanz:** {wettbewerb['distanz']}")
+                st.write(f"**Disziplin:** {wettbewerb['disziplin']}")
+
+                # Button zum Löschen
+                if st.button("Löschen", key=f"delete_{i}"):
+                    if st.button("Bestätigen?"):
+                        loesche_wettbewerb(i)
+                        st.experimental_rerun()  # Aktualisiert die Seite
+    else:
+        st.write("Keine Wettbewerbe gespeichert.")
 
 # Streamlit-App
 st.title("SSV 1928 e.V. Sulzbach")
@@ -51,16 +103,14 @@ disziplin = st.selectbox("Disziplin", ["Unterhebel", "KK", "Luftgewehr"])
 
 # Button zum Speichern
 if st.button("Wettbewerb speichern"):
-    speichern_wettbewerb(wettbewerbsname, datum, distanz, disziplin)
+    wettbewerb = {
+        "wettbewerbsname": wettbewerbsname,
+        "datum": str(datum),
+        "distanz": distanz,
+        "disziplin": disziplin
+    }
+    speichern_wettbewerb(wettbewerb)
 
 # Button zum Anzeigen
-if st.button("Wettbewerbe anzeigen"):
-    wettbewerbe = anzeigen_wettbewerbe()
-    if wettbewerbe:
-        for wettbewerb in wettbewerbe:
-            st.write(f"Wettbewerb: {wettbewerb['wettbewerbsname']}")
-            st.write(f"Datum: {wettbewerb['datum']}")
-            st.write(f"Distanz: {wettbewerb['distanz']}")
-            st.write(f"Disziplin: {wettbewerb['disziplin']}")
-    else:
-        st.write("Keine Wettbewerbe gespeichert.")
+if st.button("Wettbewerbe anzeigen (Kacheln)"):
+    anzeigen_wettbewerbe_mit_kaechen()
