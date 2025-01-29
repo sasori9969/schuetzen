@@ -1,4 +1,5 @@
 import streamlit as st
+import json
 
 st.title("SSV 1928 e.V. Sulzbach")
 st.write(
@@ -16,12 +17,14 @@ if st.button("Wettbewerb speichern"):
     # Hier würde der Code zum Speichern in der Datenbank stehen
     st.success("Wettbewerb erfolgreich gespeichert!")
 
-    # Simulierte Datenbank (in einer echten Anwendung würdest du hier eine Datenbankverbindung herstellen)
-gespeicherte_wettbewerbe = [
-     {"name": "Vereinsmeisterschaft", "datum": "2023-07-15", "disziplin": "Luftpistole 10m"},
-     {"name": "Senioren Rundenkampf", "datum": "2023-09-02", "disziplin": "Auflage Gewehr"}
-]
-     # Anzeige der gespeicherten Wettbewerbe
-st.header("Gespeicherte Wettbewerbe")
-for wettbewerb in gespeicherte_wettbewerbe:
-    st.write(f"**{wettbewerb['name']}** - {wettbewerb['datum']} ({wettbewerb['disziplin']})")
+def speichern_wettbewerb(wettbewerbsname, datum, teilnehmer, disziplin):
+    data = {
+        "wettbewerbsname": wettbewerbsname,
+        "datum": str(datum),
+        "teilnehmer": teilnehmer.split(','),
+        "disziplin": disziplin
+    }
+
+    with open('wettbewerbe.json', 'a') as f:
+        json.dump(data, f)
+        f.write('\n')  # Neue Zeile für den nächsten Eintrag
