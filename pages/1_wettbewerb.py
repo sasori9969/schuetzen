@@ -18,8 +18,8 @@ if st.button("Wettbewerb speichern"):
 
     # Simulierte Datenbank (in einer echten Anwendung würdest du hier eine Datenbankverbindung herstellen)
 gespeicherte_wettbewerbe = [
-     {"name": "Sommerfest-Turnier", "datum": "2023-07-15", "disziplin": "Fußball"},
-     {"name": "Volleyball-Cup", "datum": "2023-09-02", "disziplin": "Volleyball"}
+     {"name": "Vereinsmeisterschaft", "datum": "2023-07-15", "disziplin": "Luftpistole 10m"},
+     {"name": "Senioren Rundenkampf", "datum": "2023-09-02", "disziplin": "Auflage Gewehr"}
 ]
      # Anzeige der gespeicherten Wettbewerbe
 st.header("Gespeicherte Wettbewerbe")
