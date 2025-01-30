@@ -69,23 +69,25 @@ except json.JSONDecodeError:
 except Exception as e:
     st.write(f"Ein unerwarteter Fehler ist aufgetreten: {e}")
 
+
 st.title("Mannschaften verwalten")
 
-# Pfad zur JSON-Datei für die Finalmannschaften
+script_dir = os.path.dirname(os.path.abspath(__file__))
 finale_mannschaften_datei = os.path.join(script_dir, "finale_mannschaften.json")
 
 try:
+    # Laden der Finalmannschaften
     if os.path.exists(finale_mannschaften_datei):
         with open(finale_mannschaften_datei, "r", encoding="utf-8") as f:
             finale_mannschaften = json.load(f)
 
-        # Dropdown-Feld zur Auswahl der Mannschaft
-        mannschaft_auswahl_finale = st.selectbox("Mannschaft auswählen", [mannschaft["mannschaft"] for mannschaft in finale_mannschaften]) # Geändert: Zugriff auf "mannschaft" statt "name"
+        # Dropdown-Feld zur Auswahl der Mannschaft (korrigiert)
+        mannschaft_auswahl_finale = st.selectbox("Mannschaft auswählen (Finale)", [mannschaft["mannschaft"] for mannschaft in finale_mannschaften])
 
         # Button zum Löschen der Mannschaft
         if st.button("Mannschaft löschen"):
             for i, mannschaft in enumerate(finale_mannschaften):
-                if mannschaft["mannschaft"] == mannschaft_auswahl_finale: # Geändert: Vergleich mit "mannschaft" statt "name"
+                if mannschaft["mannschaft"] == mannschaft_auswahl_finale:
                     del finale_mannschaften[i]
                     break
 
