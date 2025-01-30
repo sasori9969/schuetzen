@@ -66,7 +66,7 @@ def loeschen(index):
         json.dump(st.session_state.data_list, f)
 
     # Lade die Daten neu, um die Tabelle zu aktualisieren
-    st.experimental_rerun()
+    st.rerun()
 
 # Rufe die Funktion zum Laden der Daten beim ersten Laden der App auf
 lade_daten()
