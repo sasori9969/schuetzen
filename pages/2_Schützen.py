@@ -1,17 +1,23 @@
 import streamlit as st
 
+# Titel der App
 st.title("SSV 1928 e.V. Sulzbach")
-st.write(
-    "Schützen"
-)
 
-container1 = st.container(border=True)
-container1.write("Mannschaft erstellen")
-container1.text_input("Mannschaftsname")
-container1.button("Speichern")
+# Abschnitt 1: Mannschaft erstellen
+st.header("Mannschaft erstellen")
+mannschaft_name = st.text_input("Mannschaftsname eingeben")
+if st.button("Mannschaft speichern"):
+    if mannschaft_name:
+        st.success(f"Mannschaft '{mannschaft_name}' wurde erfolgreich erstellt!")
+    else:
+        st.error("Bitte gib einen Mannschaftsnamen ein.")
 
-container2 = st.container(border=True)
-container2.write("Schützen anlegen")
-container2.text_input("Vorname")
-container2.text_input("Name")
-container2.button("Speichernn")
+# Abschnitt 2: Schützen anlegen
+st.header("Schützen anlegen")
+schuetze_name = st.text_input("Nachname des Schützen eingeben")
+schuetze_alter = st.text_input("Vorname des Schützen eingeben")
+if st.button("Schützen speichern"):
+    if schuetze_name and schuetze_alter:
+        st.success(f"Schütze '{schuetze_name}' (Alter: {schuetze_alter}) wurde erfolgreich angelegt!")
+    else:
+        st.error("Bitte fülle alle Felder aus.")
