@@ -1,8 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="Schützen anlegen")
-st.title("Schützen anlegen")
+st.set_page_config(page_title="Schützenverwaltung")
+st.title("Schützenverwaltung")
 
 # Initialisiere den DataFrame im st.session_state
 if "schuetzen_df" not in st.session_state:
@@ -11,71 +11,57 @@ if "schuetzen_df" not in st.session_state:
     except FileNotFoundError:
         st.session_state.schuetzen_df = pd.DataFrame(columns=["Startnummer", "Name", "Wertung", "Mannschaft"])
 
-    # Stelle sicher, dass 'Startnummer' existiert und fülle sie, falls nötig
-    if 'Startnummer' not in st.session_state.schuetzen_df.columns:
-        st.session_state.schuetzen_df['Startnummer'] = []  # Initialisiere als leere Liste
-    elif st.session_state.schuetzen_df.empty:  # Handle leeren DataFrame mit vorhandener Spalte
-        st.session_state.schuetzen_df['Startnummer'] = []  # Initialisiere als leere Liste
-    # Fülle die Startnummern, wenn die Spalte existiert und der DataFrame nicht leer ist.
-    if not st.session_state.schuetzen_df.empty and not st.session_state.schuetzen_df['Startnummer'].tolist(): # Überprüfe, ob der DataFrame nicht leer ist und die Liste leer ist
-        st.session_state.schuetzen_df['Startnummer'] = range(1, len(st.session_state.schuetzen_df) + 1)
+# Funktion zum Speichern des DataFrames
+def speichern():
+    st.session_state.schuetzen_df.to_csv("schuetzen.csv", index=False)
 
+# Funktion zum Hinzufügen eines Schützen
+def add_schuetze(name, wertung, mannschaft):
+    next_startnummer = st.session_state.schuetzen_df['Startnummer'].max() + 1 if not st.session_state.schuetzen_df.empty else 1
+    new_entry = {"Startnummer": next_startnummer, "Name": name, "Wertung": wertung, "Mannschaft": mannschaft}
+    st.session_state.schuetzen_df = pd.concat([st.session_state.schuetzen_df, pd.DataFrame([new_entry])], ignore_index=True)
+    speichern()
+
+# Funktion zum Löschen ausgewählter Schützen
+def loeschen():
+    ausgewaehlte_indices = edited_df[edited_df["Löschen"]].index
+    if ausgewaehlte_indices.any():
+        if st.button("Bist du sicher, dass du diese Schützen löschen möchtest?"):
+            st.session_state.schuetzen_df = st.session_state.schuetzen_df.drop(ausgewaehlte_indices)
+            speichern()
+            st.success("Schützen erfolgreich gelöscht.")
+            st.experimental_rerun()
+        else:
+            st.warning("Bitte wähle mindestens einen Schützen zum Löschen aus.")
 
 st.header("Schützen anlegen")
 
-with st.form("schütze_anlegen"):
+with st.form("schuetze_anlegen"):
     name = st.text_input("Name des Schützen")
     wertung = st.selectbox("Wertung", ["Einzel", "Team", "Einzel+Team"])
     mannschaft = st.text_input("Mannschaft")
     submitted = st.form_submit_button("Speichern")
 
 if submitted:
-    # Finde die höchste bestehende Startnummer oder starte bei 1, wenn DataFrame leer ist oder keine Startnummern vorhanden sind
-    if not st.session_state.schuetzen_df.empty and st.session_state.schuetzen_df['Startnummer'].tolist(): # Überprüfe, ob der DataFrame nicht leer ist und die Liste nicht leer ist
-        next_startnummer = st.session_state.schuetzen_df['Startnummer'].max() + 1
-    else:
-        next_startnummer = 1
-
-    new_entry = {
-        "Startnummer": next_startnummer,
-        "Name": name,
-        "Wertung": wertung,
-        "Mannschaft": mannschaft,
-    }
-    st.session_state.schuetzen_df.loc[len(st.session_state.schuetzen_df)] = new_entry
-    st.session_state.schuetzen_df.to_csv("schuetzen.csv", index=False)
-    st.rerun()
-
-# Zeige den DataFrame an
-st.header("Übersicht der Schützen")
+    add_schuetze(name, wertung, mannschaft)
 
 edited_df = st.data_editor(
     st.session_state.schuetzen_df,
     use_container_width=True,
     hide_index=True,
     column_config={
-        "Startnummer": st.column_config.NumberColumn(
-            "Startnummer",
-            help="Eindeutige Startnummer",
-            disabled=True,  # Startnummer kann nicht bearbeitet werden
-        ),
-        "Wertung": st.column_config.SelectboxColumn(
-            "Wertung",
-            help="Wie startet der Schütze",
-            options=["Einzel", "Team", "Einzel+Team"],
-            required=True,
-        ),
-        "Mannschaft": st.column_config.TextColumn(
-            "Mannschaft",
-            default="",  # Standardwert ist leer
-            help="Name der Mannschaft",
-        ),
-    },
-    disabled=["Name"],
+        "Startnummer": st.column_config.NumberColumn("Startnummer", help="Eindeutige Startnummer", disabled=True),
+        "Name": st.column_config.TextColumn("Name", disabled=True),
+        "Wertung": st.column_config.SelectboxColumn("Wertung", help="Wie startet der Schütze", options=["Einzel", "Team", "Einzel+Team"], required=True),
+        "Mannschaft": st.column_config.TextColumn("Mannschaft", default="", help="Name der Mannschaft"),
+        "Löschen": st.column_config.CheckboxColumn("Löschen", default=False, help="Markiere die Schützen, die gelöscht werden sollen")
+    }
 )
 
-# Wenn der DataFrame bearbeitet wurde, speichere die Änderungen
-if not edited_df.equals(st.session_state.schuetzen_df):
-    st.session_state.schuetzen_df = edited_df.copy()  # Erstelle eine Kopie
-    st.session_state.schuetzen_df.to_csv("schuetzen.csv", index=False)
-    st.rerun()  # oder st.experimental_rerun()
+# Automatisches Speichern bei Änderungen
+if st.session_state.schuetzen_df is not None and not edited_df.equals(st.session_state.schuetzen_df):
+    st.session_state.schuetzen_df = edited_df.copy()
+    speichern()
+
+if st.button("Schützen löschen"):
+    loeschen()
