@@ -1,13 +1,21 @@
 [
     {
         "wettkampf": "Kampf",
-        "mannschaft": "Ringer",
+        "mannschaft": "Feuerwehr",
         "mitglieder": [
             {
+                "mitglied": "Gregor Knapp",
+                "punkte": 188
+            },
+            {
                 "mitglied": "Lydia Knapp",
-                "punkte": 0
+                "punkte": 190
+            },
+            {
+                "mitglied": "Erna Knapp",
+                "punkte": 111
             }
         ],
-        "team_ergebnis": 0
+        "team_ergebnis": 489
     }
 ]

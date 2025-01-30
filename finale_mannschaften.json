@@ -7,5 +7,14 @@
             "Lydia Knapp",
             "Lydia Knapp"
         ]
+    },
+    {
+        "wettkampf": "Kampf",
+        "mannschaft": "Feuerwehr",
+        "mitglieder": [
+            "Gregor Knapp",
+            "Lydia Knapp",
+            "Erna Knapp"
+        ]
     }
 ]
