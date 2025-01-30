@@ -4,6 +4,10 @@ import json
 st.title("SSV 1928 e.V. Sulzbach")
 st.write("Wettbewerb")
 
+# Initialisiere den Session State, falls noch nicht geschehen
+if "data_list" not in st.session_state:
+    st.session_state.data_list = []
+
 # Erstelle die Texteingabefelder und speichere die Labels separat
 wettbewerb = st.text_input("Wettbewerb:")
 disziplin = st.text_input("Disziplin:")
@@ -12,9 +16,6 @@ datum = st.date_input("Datum:")
 
 # Liste der Labels
 spalten_ueberschriften = ["Wettbewerb", "Disziplin", "Distanz", "Datum"]
-
-# Leere Liste zum Speichern der Daten
-data_list = []
 
 def speichern():
     # Erstelle ein Python-Dictionary mit den eingegebenen Daten
@@ -25,38 +26,47 @@ def speichern():
         "Datum": str(datum)
     }
 
-    # Füge das Dictionary zur Liste hinzu
-    data_list.append(data)
+    # Füge das Dictionary zur Liste im Session State hinzu
+    st.session_state.data_list.append(data)
 
     # Speichere die gesamte Liste als JSON-Datei
     with open("wettbewerbe.json", "w") as f:
-        json.dump(data_list, f)
+        json.dump(st.session_state.data_list, f)
 
     st.success("Daten erfolgreich gespeichert!")
 
 # Button zum Speichern
-st.button("Speichern", on_click=speichern)
+if st.button("Speichern"):
+    speichern()
 
 def lade_daten():
     try:
         with open("wettbewerbe.json", "r") as f:
-            global data_list
-            data_list = json.load(f)
+            # Lade die Daten in den Session State
+            st.session_state.data_list = json.load(f)
     except FileNotFoundError:
-        data_list = []
+        st.session_state.data_list = []
 
-    # Erstelle eine Liste von Listen, wobei jede innere Liste eine Zeile der Tabelle darstellt
-#    data = [[d[col] for col in spalten_ueberschriften] for d in data_list]
-    data = [[d[col] for col in spalten_ueberschriften] + [st.button("Löschen", key=f"delete_{i}")] for i, d in enumerate(data_list)]
-
-    # Zeige die Tabelle an
-    st.dataframe(data)
+    # Zeige die Daten in einer Tabelle an
+    for i, d in enumerate(st.session_state.data_list):
+        cols = st.columns([4, 4, 4, 4, 2])
+        cols[0].write(d["Wettbewerb"])
+        cols[1].write(d["Disziplin"])
+        cols[2].write(d["Distanz"])
+        cols[3].write(d["Datum"])
+        if cols[4].button("Löschen", key=f"delete_{i}"):
+            loeschen(i)
 
 def loeschen(index):
-    del data_list[index]
+    # Entferne den Eintrag aus der Liste im Session State
+    st.session_state.data_list.pop(index)
+
+    # Speichere die aktualisierte Liste in der JSON-Datei
     with open("wettbewerbe.json", "w") as f:
-        json.dump(data_list, f)
-    lade_daten()
+        json.dump(st.session_state.data_list, f)
+
+    # Lade die Daten neu, um die Tabelle zu aktualisieren
+    st.experimental_rerun()
 
 # Rufe die Funktion zum Laden der Daten beim ersten Laden der App auf
 lade_daten()
