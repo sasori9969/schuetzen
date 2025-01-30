@@ -25,5 +25,14 @@
             "k1 k",
             "3 k"
         ]
+    },
+    {
+        "wettkampf": "Keine Wettbewerbe vorhanden",
+        "mannschaft": "Feuer",
+        "mitglieder": [
+            "k1 k",
+            "k1 k",
+            "k1 k"
+        ]
     }
 ]
