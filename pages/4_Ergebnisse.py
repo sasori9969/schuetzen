@@ -38,10 +38,10 @@ if st.session_state.mannschaften:
         for mannschaft in st.session_state.data_list:
             if mannschaft["mannschaft"] == ausgewaehlte_mannschaft:
                 st.write("Mitglieder:")
-                mitglieder = mannschaft.get("mitglieder", []) # Speichere die Mitglieder in einer Variable
+                mitglieder = mannschaft.get("mitglieder", [])
                 for mitglied in mitglieder:
                     st.write(f"- {mitglied}")
-                break  # Wichtig: Beende die Schleife, sobald die Mannschaft gefunden wurde
+                break
 
         # Eingabefelder für die Ergebnisse mit eindeutigen Keys
         st.subheader("Ergebnis eingeben")
@@ -49,33 +49,38 @@ if st.session_state.mannschaften:
 
         for i, mitglied in enumerate(mitglieder):
             key = f"punkte_{ausgewaehlte_mannschaft}_{mitglied}_{i}"
-            punkte[mitglied] = st.number_input(f"Punkte für {mitglied}", key=key, min_value=0) # min_value hinzugefügt
+            punkte[mitglied] = st.number_input(f"Punkte für {mitglied}", key=key, min_value=0)
+
+        # Berechnung des Teamergebnisses
+        team_ergebnis = sum(punkte.values())
+        st.write(f"Team Ergebnis: {team_ergebnis}")
 
         if st.button("Ergebnis speichern"):
             # Logik zum Speichern der Ergebnisse
-            if punkte: # Überprüfe, ob überhaupt Punkte eingegeben wurden
+            if punkte:
                 ergebnisse_liste = []
                 for mitglied, wert in punkte.items():
                     ergebnisse_liste.append({"mitglied": mitglied, "punkte": wert})
 
-                # Datenstruktur für die Speicherung (Beispiel)
+                # Datenstruktur für die Speicherung
                 daten_zum_speichern = {
-                    "wettkampf": "Dein Wettkampf Name", # Hier solltest du den Wettkampfnamen dynamisch einfügen
+                    "wettkampf": "Dein Wettkampf Name",  # Hier solltest du den Wettkampfnamen dynamisch einfügen
                     "mannschaft": ausgewaehlte_mannschaft,
-                    "mitglieder": ergebnisse_liste
+                    "mitglieder": ergebnisse_liste,
+                    "team_ergebnis": team_ergebnis
                 }
 
                 # TODO: Implementiere die tatsächliche Speicherung der Daten (z.B. in eine JSON-Datei)
-                st.write("Ergebnisse werden gespeichert (noch nicht implementiert):") # Hinweis für den Benutzer
-                st.write(daten_zum_speichern) # Ausgabe zur Kontrolle.
+                st.write("Ergebnisse werden gespeichert (noch nicht implementiert):")
+                st.write(daten_zum_speichern)
 
                 # Beispiel für das Speichern in eine JSON-Datei (ersetze dies mit deiner Logik):
                 # with open("ergebnisse.json", "w") as f:
                 #     json.dump(daten_zum_speichern, f, indent=4)
-                # st.success("Ergebnisse erfolgreich gespeichert!") # Rückmeldung an den Benutzer.
+                # st.success("Ergebnisse erfolgreich gespeichert!")
+
             else:
                 st.warning("Bitte geben Sie Ergebnisse ein, bevor Sie speichern.")
-
 
 else:
     st.write("Keine Mannschaften zum Auswählen gefunden.")
