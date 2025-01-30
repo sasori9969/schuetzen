@@ -47,6 +47,9 @@ try:
                     for mitglied in eintrag["mitglieder"]:
                         if mitglied["mitglied"] == mitglied_auswahl:
                             mitglied["punkte"] = neues_ergebnis
+
+                            # Aktualisiere das Gesamtmannschaftsergebnis
+                            eintrag["team_ergebnis"] = sum(m["punkte"] for m in eintrag["mitglieder"])
                             break  # Innere Schleife beenden, sobald das Mitglied gefunden wurde
                     break  # Äußere Schleife beenden, sobald die Mannschaft gefunden wurde
 
@@ -54,7 +57,7 @@ try:
             with open(ergebnisse_datei, "w", encoding="utf-8") as f:
                 json.dump(ergebnisse, f, indent=4, ensure_ascii=False)
 
-            st.success("Ergebnis erfolgreich geändert!")
+            st.success("Ergebnis erfolgreich geändert und Team-Ergebnis aktualisiert!")
 
     else:
         st.write("Noch keine Ergebnisse vorhanden.")
