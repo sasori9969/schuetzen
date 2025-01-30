@@ -2,7 +2,7 @@ import streamlit as st
 import json
 import os
 
-st.title("Mannschaften verwalten")
+st.title("Mannschaften löschen")
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 finale_mannschaften_datei = os.path.join(script_dir, "finale_mannschaften.json")
