@@ -26,11 +26,18 @@ if submitted:
 # Zeige den DataFrame an (außerhalb des Formulars!)
 st.header("Übersicht der Schützen")
 
-# Passe die Spaltenbreite mit column_config an
-st.dataframe(
+edited_df = st.data_editor(
     st.session_state.schuetzen_df,
+    use_container_width=True,
+    hide_index=True,
     column_config={
-        "Name": st.column_config.Column(width="medium"),  # Oder "small", "large", oder eine spezifische Breite in Pixeln
-        "Wertung": st.column_config.Column(width="medium"),
+        "Wertung": st.column_config.SelectboxColumn(
+            "Wertung",
+            help="Ticket status",
+            options=["Einzel", "Team", "Einzel+Team"],
+            required=True,
+        ),
     },
+    # Disable editing the ID and Date Submitted columns.
+    disabled=["Name"],
 )
