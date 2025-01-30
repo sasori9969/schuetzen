@@ -46,10 +46,17 @@ def lade_daten():
         data_list = []
 
     # Erstelle eine Liste von Listen, wobei jede innere Liste eine Zeile der Tabelle darstellt
-    data = [[d[col] for col in spalten_ueberschriften] for d in data_list]
+#    data = [[d[col] for col in spalten_ueberschriften] for d in data_list]
+    data = [[d[col] for col in spalten_ueberschriften] + [st.button("Löschen", key=f"delete_{i}")] for i, d in enumerate(data_list)]
 
     # Zeige die Tabelle an
-    st.table(data)
+    st.dataframe(data)
+
+def loeschen(index):
+    del data_list[index]
+    with open("wettbewerbe.json", "w") as f:
+        json.dump(data_list, f)
+    lade_daten()
 
 # Rufe die Funktion zum Laden der Daten beim ersten Laden der App auf
 lade_daten()
