@@ -40,6 +40,27 @@ def lade_daten():
         st.error("schuetzen.json nicht gefunden!")
         st.session_state.schuetzen = []
 
+def speichere_mannschaft():
+    neue_mannschaft = {
+        "wettkampf": st.session_state['wettkampf_name'],
+        "mannschaft": team_name,
+        "mitglieder": st.session_state.selected_names
+    }
+
+    try:
+        with open("finale_mannschaften.json", "r") as f:
+            finale_mannschaften = json.load(f)
+    except FileNotFoundError:
+        finale_mannschaften = []
+
+    finale_mannschaften.append(neue_mannschaft)
+
+    with open("finale_mannschaften.json", "w") as f:
+        json.dump(finale_mannschaften, f, indent=4)
+
+    st.success("Mannschaft erfolgreich in finale_mannschaften.json gespeichert!")
+
+
 # Hauptseite
 lade_daten()
 
@@ -69,7 +90,6 @@ if st.session_state['wettkampf_name']:
     for i in range(3):
         st.write(f"Name {i+1}: {st.session_state.selected_names[i]}")
 
-    # Button zum Speichern der Daten (Beispiel)
-    if st.button("Daten speichern"):
-        # Hier kannst du den Code zum Speichern der Daten hinzufügen (z.B. in eine Datei oder Datenbank)
-        st.success("Daten wurden gespeichert!")
+    # Button zum Speichern der Daten
+    if st.button("Mannschaft speichern"):
+        speichere_mannschaft()
