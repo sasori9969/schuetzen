@@ -76,9 +76,8 @@ if st.session_state.mannschaften:
                     "team_ergebnis": team_ergebnis
                 }
 
-                # Pfad zur JSON-Datei (relativ zum aktuellen Skript)
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                ergebnisse_datei = os.path.join(script_dir, "ergebnisse.json")
+                # Pfad zur JSON-Datei (relativ zum Hauptverzeichnis)
+                ergebnisse_datei = "ergebnisse.json"  # Direkt im Hauptverzeichnis
 
                 try:
                     # Laden vorhandener Ergebnisse (falls vorhanden)

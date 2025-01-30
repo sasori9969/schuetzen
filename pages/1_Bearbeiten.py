@@ -5,8 +5,8 @@ import os
 st.title("Ergebnis ändern")
 
 # Pfad zur JSON-Datei
-script_dir = os.path.dirname(os.path.abspath(__file__))
-ergebnisse_datei = os.path.join(script_dir, "ergebnisse.json")
+#script_dir = os.path.dirname(os.path.abspath(__file__))
+ergebnisse_datei = "ergebnisse.json"
 
 try:
     if os.path.exists(ergebnisse_datei):

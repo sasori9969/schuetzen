@@ -4,37 +4,39 @@ import os
 
 st.title("Mannschaften löschen")
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-finale_mannschaften_datei = os.path.join(script_dir, "finale_mannschaften.json")
+#script_dir = os.path.dirname(os.path.abspath(__file__))
+finale_mannschaften_datei = "finale_mannschaften.json"
 
-try:
-    # Laden der Finalmannschaften
-    if os.path.exists(finale_mannschaften_datei):
+def lade_mannschaften():
+    try:
         with open(finale_mannschaften_datei, "r", encoding="utf-8") as f:
-            finale_mannschaften = json.load(f)
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []  # Leere Liste zurückgeben, wenn Datei nicht existiert oder ungültig ist
 
-        # Dropdown-Feld zur Auswahl der Mannschaft (korrigiert)
-        mannschaft_auswahl_finale = st.selectbox("Mannschaft auswählen", [mannschaft["mannschaft"] for mannschaft in finale_mannschaften])
+def speichere_mannschaften(mannschaften):
+    with open(finale_mannschaften_datei, "w", encoding="utf-8") as f:
+        json.dump(mannschaften, f, indent=4, ensure_ascii=False)
 
-        # Button zum Löschen der Mannschaft
-        if st.button("Mannschaft löschen"):
-            for i, mannschaft in enumerate(finale_mannschaften):
-                if mannschaft["mannschaft"] == mannschaft_auswahl_finale:
-                    del finale_mannschaften[i]
-                    break
+finale_mannschaften = lade_mannschaften()
 
-            # Änderungen in finale_mannschaften.json speichern
-            with open(finale_mannschaften_datei, "w", encoding="utf-8") as f:
-                json.dump(finale_mannschaften, f, indent=4, ensure_ascii=False)
+if not finale_mannschaften:
+    st.write("Noch keine Finalmannschaften vorhanden.")
+else:
+    mannschaft_auswahl_finale = st.selectbox("Mannschaft auswählen", [mannschaft["mannschaft"] for mannschaft in finale_mannschaften])
 
-            st.success(f"Mannschaft '{mannschaft_auswahl_finale}' erfolgreich gelöscht!")
+    if st.button("Mannschaft löschen"):
+        for i, mannschaft in enumerate(finale_mannschaften):
+            if mannschaft["mannschaft"] == mannschaft_auswahl_finale:
+                del finale_mannschaften[i]
+                break
 
-    else:
-        st.write("Noch keine Finalmannschaften vorhanden.")
+        speichere_mannschaften(finale_mannschaften)
+        st.success(f"Mannschaft '{mannschaft_auswahl_finale}' erfolgreich gelöscht!")
 
-except FileNotFoundError:
-    st.write("Datei für Finalmannschaften nicht gefunden.")
-except json.JSONDecodeError:
-    st.write("Fehler beim Lesen der Datei für Finalmannschaften. Datei ist möglicherweise beschädigt.")
-except Exception as e:
-    st.write(f"Ein unerwarteter Fehler ist aufgetreten: {e}")
+        # Aktualisiere die Auswahl nach dem Löschen
+        finale_mannschaften = lade_mannschaften()  # Neu laden
+        if finale_mannschaften:
+            mannschaft_auswahl_finale = st.selectbox("Mannschaft auswählen", [mannschaft["mannschaft"] for mannschaft in finale_mannschaften])
+        else:
+            st.write("Alle Mannschaften wurden gelöscht.")
