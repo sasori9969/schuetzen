@@ -1,0 +1,13 @@
+[
+    {
+        "wettkampf": "Kampf",
+        "mannschaft": "Ringer",
+        "mitglieder": [
+            {
+                "mitglied": "Lydia Knapp",
+                "punkte": 0
+            }
+        ],
+        "team_ergebnis": 0
+    }
+]

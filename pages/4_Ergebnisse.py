@@ -1,5 +1,6 @@
 import streamlit as st
 import json
+import os
 
 # Titel der App
 st.title("SSV 1928 e.V. Sulzbach")
@@ -12,6 +13,8 @@ if "mannschaften" not in st.session_state:
     st.session_state.mannschaften = []
 if "ausgewaehlte_mannschaft" not in st.session_state:
     st.session_state.ausgewaehlte_mannschaft = None
+if "wettkampf_name" not in st.session_state:  # Für den dynamischen Wettkampfnamen
+    st.session_state.wettkampf_name = ""
 
 # Funktionen
 def lade_daten():
@@ -25,6 +28,9 @@ def lade_daten():
 
 # Hauptseite
 lade_daten()
+
+# Eingabefeld für den Wettkampfnamen
+st.session_state.wettkampf_name = st.text_input("Wettkampf Name", st.session_state.wettkampf_name)
 
 # Dropdown-Menü für die Mannschaftsauswahl
 if st.session_state.mannschaften:
@@ -43,7 +49,7 @@ if st.session_state.mannschaften:
                     st.write(f"- {mitglied}")
                 break
 
-        # Eingabefelder für die Ergebnisse mit eindeutigen Keys
+        # Eingabefelder für die Ergebnisse
         st.subheader("Ergebnis eingeben")
         punkte = {}
 
@@ -64,20 +70,35 @@ if st.session_state.mannschaften:
 
                 # Datenstruktur für die Speicherung
                 daten_zum_speichern = {
-                    "wettkampf": "Dein Wettkampf Name",  # Hier solltest du den Wettkampfnamen dynamisch einfügen
+                    "wettkampf": st.session_state.wettkampf_name,  # Dynamischer Wettkampfname
                     "mannschaft": ausgewaehlte_mannschaft,
                     "mitglieder": ergebnisse_liste,
                     "team_ergebnis": team_ergebnis
                 }
 
-                # TODO: Implementiere die tatsächliche Speicherung der Daten (z.B. in eine JSON-Datei)
-                st.write("Ergebnisse werden gespeichert (noch nicht implementiert):")
-                st.write(daten_zum_speichern)
+                # Pfad zur JSON-Datei (relativ zum aktuellen Skript)
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                ergebnisse_datei = os.path.join(script_dir, "ergebnisse.json")
 
-                # Beispiel für das Speichern in eine JSON-Datei (ersetze dies mit deiner Logik):
-                # with open("ergebnisse.json", "w") as f:
-                #     json.dump(daten_zum_speichern, f, indent=4)
-                # st.success("Ergebnisse erfolgreich gespeichert!")
+                try:
+                    # Laden vorhandener Ergebnisse (falls vorhanden)
+                    if os.path.exists(ergebnisse_datei):
+                        with open(ergebnisse_datei, "r") as f:
+                            gespeicherte_ergebnisse = json.load(f)
+                    else:
+                        gespeicherte_ergebnisse = []
+
+                    # Hinzufügen der neuen Ergebnisse
+                    gespeicherte_ergebnisse.append(daten_zum_speichern)
+
+                    # Speichern der aktualisierten Ergebnisse
+                    with open(ergebnisse_datei, "w") as f:
+                        json.dump(gespeicherte_ergebnisse, f, indent=4, ensure_ascii=False)
+
+                    st.success(f"Ergebnisse für Mannschaft '{ausgewaehlte_mannschaft}' erfolgreich gespeichert!")
+
+                except Exception as e:
+                    st.error(f"Fehler beim Speichern der Ergebnisse: {e}")
 
             else:
                 st.warning("Bitte geben Sie Ergebnisse ein, bevor Sie speichern.")
