@@ -1,3 +1,7 @@
+import streamlit as st
+import json
+import os
+
 st.title("Mannschaften verwalten")
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
