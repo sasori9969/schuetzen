@@ -24,16 +24,21 @@ def add_schuetze(name, wertung, mannschaft):
 
 # Funktion zum Löschen ausgewählter Schützen
 def loeschen():
-    ausgewaehlte_indices = edited_df[edited_df["Löschen"]].index
+    ausgewaehlte_indices = edited_df[edited_df["Löschen"] == True].index  # Filter for True values only
     if ausgewaehlte_indices.any():
-        if st.button("Bist du sicher, dass du diese Schützen löschen möchtest?"):
-            st.session_state.schuetzen_df = st.session_state.schuetzen_df.drop(ausgewaehlte_indices)
+        if st.button("Bist du sicher?"):
+            # Debug-Ausgabe:
+            print(f"Zu löschende Indices: {ausgewaehlte_indices}")
+
+            # Sicherstellen, dass inplace=False verwendet wird
+            st.session_state.schuetzen_df = st.session_state.schuetzen_df.drop(ausgewaehlte_indices, inplace=False)
             speichern()
             st.success("Schützen erfolgreich gelöscht.")
             st.experimental_rerun()
         else:
-            st.warning("Bitte wähle mindestens einen Schützen zum Löschen aus.")
-
+            st.warning("Löschung abgebrochen.")
+    else:
+        st.warning("Bitte wähle mindestens einen Schützen zum Löschen aus.")
 st.header("Schützen anlegen")
 
 with st.form("schuetze_anlegen"):
@@ -57,6 +62,7 @@ edited_df = st.data_editor(
         "Löschen": st.column_config.CheckboxColumn("Löschen", default=False, help="Markiere die Schützen, die gelöscht werden sollen")
     }
 )
+
 
 # Automatisches Speichern bei Änderungen
 if st.session_state.schuetzen_df is not None and not edited_df.equals(st.session_state.schuetzen_df):
