@@ -2,7 +2,7 @@ import streamlit as st
 import json
 import os
 
-st.title("Team bearbeiten")
+st.title("Ergebnis ändern")
 
 # Pfad zur JSON-Datei
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,44 +16,45 @@ try:
         # Dropdown-Feld zur Auswahl der Mannschaft
         mannschaft_auswahl = st.selectbox("Mannschaft auswählen", [eintrag["mannschaft"] for eintrag in ergebnisse])
 
-        # Anzeigen der aktuellen Teamzusammensetzung
+        # Dropdown-Feld zur Auswahl des Mitglieds
+        mitglied_auswahl = st.selectbox(
+            "Mitglied auswählen",
+            [
+                mitglied["mitglied"]
+                for eintrag in ergebnisse
+                if eintrag["mannschaft"] == mannschaft_auswahl
+                for mitglied in eintrag["mitglieder"]
+            ],
+        )
+
+        # Aktuelles Ergebnis anzeigen
         for eintrag in ergebnisse:
             if eintrag["mannschaft"] == mannschaft_auswahl:
-                st.write(f"Aktuelle Teamzusammensetzung für {mannschaft_auswahl}:")
                 for mitglied in eintrag["mitglieder"]:
-                    st.write(f"- {mitglied['mitglied']} ({mitglied['punkte']} Punkte)")
+                    if mitglied["mitglied"] == mitglied_auswahl:
+                        aktuelles_ergebnis = mitglied["punkte"]
+                        st.write(f"Aktuelles Ergebnis für {mitglied_auswahl}: {aktuelles_ergebnis}")
+                        break
                 break
 
-        # Eingabefelder zum Ändern der Teamzusammensetzung
-        st.subheader("Teamzusammensetzung ändern")
+        # Eingabefeld für das neue Ergebnis
+        neues_ergebnis = st.number_input("Neues Ergebnis", min_value=0)
 
-        # Neues Mitglied hinzufügen
-        neues_mitglied_name = st.text_input("Name des neuen Mitglieds")
-        neues_mitglied_punkte = st.number_input("Punkte des neuen Mitglieds", min_value=0)
-        if st.button("Mitglied hinzufügen"):
+        # Button zum Speichern der Änderung
+        if st.button("Ergebnis ändern"):
             for eintrag in ergebnisse:
                 if eintrag["mannschaft"] == mannschaft_auswahl:
-                    eintrag["mitglieder"].append({"mitglied": neues_mitglied_name, "punkte": neues_mitglied_punkte})
-                    break
-            st.success(f"Mitglied '{neues_mitglied_name}' erfolgreich hinzugefügt!")
+                    for mitglied in eintrag["mitglieder"]:
+                        if mitglied["mitglied"] == mitglied_auswahl:
+                            mitglied["punkte"] = neues_ergebnis
+                            break  # Innere Schleife beenden, sobald das Mitglied gefunden wurde
+                    break  # Äußere Schleife beenden, sobald die Mannschaft gefunden wurde
 
-        # Mitglied entfernen
-        mitglied_zum_entfernen = st.selectbox(
-            "Mitglied zum Entfernen auswählen",
-            [mitglied["mitglied"] for eintrag in ergebnisse if eintrag["mannschaft"] == mannschaft_auswahl for mitglied in eintrag["mitglieder"]]
-        )
-        if st.button("Mitglied entfernen"):
-            for eintrag in ergebnisse:
-                if eintrag["mannschaft"] == mannschaft_auswahl:
-                    eintrag["mitglieder"] = [mitglied for mitglied in eintrag["mitglieder"] if mitglied["mitglied"] != mitglied_zum_entfernen]
-                    break
-            st.success(f"Mitglied '{mitglied_zum_entfernen}' erfolgreich entfernt!")
-
-        # Änderungen speichern
-        if st.button("Änderungen speichern"):
+            # Änderungen in ergebnisse.json speichern
             with open(ergebnisse_datei, "w", encoding="utf-8") as f:
                 json.dump(ergebnisse, f, indent=4, ensure_ascii=False)
-            st.success("Änderungen erfolgreich gespeichert!")
+
+            st.success("Ergebnis erfolgreich geändert!")
 
     else:
         st.write("Noch keine Ergebnisse vorhanden.")
