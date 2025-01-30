@@ -5,8 +5,12 @@ st.set_page_config(page_title="Schützen anlegen")
 st.title("Schützen anlegen")
 
 # Initialisiere den DataFrame im st.session_state, falls er noch nicht existiert
+# oder lade ihn aus der CSV-Datei, falls sie existiert
 if "schuetzen_df" not in st.session_state:
-    st.session_state.schuetzen_df = pd.DataFrame(columns=["Name", "Wertung"])
+    try:
+        st.session_state.schuetzen_df = pd.read_csv("schuetzen.csv")
+    except FileNotFoundError:
+        st.session_state.schuetzen_df = pd.DataFrame(columns=["Name", "Wertung"])
 
 st.header("Schützen anlegen")
 
@@ -20,10 +24,13 @@ if submitted:
         "Name": name,
         "Wertung": wertung,
     }
-    # Füge den neuen Eintrag zum DataFrame hinzu (mit .loc für Effizienz)
+    # Füge den neuen Eintrag zum DataFrame hinzu
     st.session_state.schuetzen_df.loc[len(st.session_state.schuetzen_df)] = new_entry
 
-# Zeige den DataFrame an (außerhalb des Formulars!)
+    # Speichere den DataFrame in der CSV-Datei
+    st.session_state.schuetzen_df.to_csv("schuetzen.csv", index=False)
+
+# Zeige den DataFrame an
 st.header("Übersicht der Schützen")
 
 edited_df = st.data_editor(
@@ -38,6 +45,11 @@ edited_df = st.data_editor(
             required=True,
         ),
     },
-    # Disable editing the ID and Date Submitted columns.
     disabled=["Name"],
 )
+
+# Wenn der DataFrame bearbeitet wurde, speichere die Änderungen
+if not edited_df.equals(st.session_state.schuetzen_df):
+    st.session_state.schuetzen_df = edited_df
+    st.session_state.schuetzen_df.to_csv("schuetzen.csv", index=False)
+    st.experimental_rerun()  # Erzwingt ein Neuladen der App, um die Änderungen anzuzeigen
