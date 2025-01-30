@@ -66,9 +66,9 @@ if st.session_state.current_page == "main":
         cols[1].write(d["Disziplin"])
         cols[2].write(d["Distanz"])
         cols[3].write(d["Datum"])
-        if cols[4].button("Löschen", key=f"delete_{i}"):
+        if cols[4].button("del", key=f"delete_{i}"):
             loeschen(i)
-        if cols[5].button("Auswählen", key=f"select_{i}"):
+        if cols[5].button("Go", key=f"select_{i}"):
             auswahlen(i)
 
 # Detailseite für den ausgewählten Wettbewerb
