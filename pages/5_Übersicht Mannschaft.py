@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import os
 
+
 st.title("Mannschaftsergebnisse")
 
 # Pfad zur JSON-Datei im Hauptverzeichnis
