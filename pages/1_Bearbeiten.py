@@ -80,12 +80,12 @@ try:
             finale_mannschaften = json.load(f)
 
         # Dropdown-Feld zur Auswahl der Mannschaft
-        mannschaft_auswahl_finale = st.selectbox("Mannschaft auswählen (Finale)", [mannschaft["name"] for mannschaft in finale_mannschaften])
+        mannschaft_auswahl_finale = st.selectbox("Mannschaft auswählen", [mannschaft["mannschaft"] for mannschaft in finale_mannschaften]) # Geändert: Zugriff auf "mannschaft" statt "name"
 
         # Button zum Löschen der Mannschaft
         if st.button("Mannschaft löschen"):
             for i, mannschaft in enumerate(finale_mannschaften):
-                if mannschaft["name"] == mannschaft_auswahl_finale:
+                if mannschaft["mannschaft"] == mannschaft_auswahl_finale: # Geändert: Vergleich mit "mannschaft" statt "name"
                     del finale_mannschaften[i]
                     break
 
