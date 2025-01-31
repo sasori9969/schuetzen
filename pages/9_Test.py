@@ -15,7 +15,7 @@ def speichern():
     st.session_state.schuetzen_df.to_csv("schuetzen.csv", index=False)
 
 # Funktion zum Hinzufügen eines Schützen
-def add_schuetze(name, wertung, mannschaft, status, ergebnis1, ergebnis2, ergebnis3, gesamtergebnis):
+def add_schuetze(name, wertung, mannschaft, status, ergebnis1, ergebnis2, ergebnis3):
     # Validate input
     if wertung not in ["Einzel", "Team", "Einzel+Team"] or status not in ["Aktiv", "deaktivieren"]:
         st.error("Ungültige Eingabe für Wertung oder Status.")
@@ -31,11 +31,13 @@ def add_schuetze(name, wertung, mannschaft, status, ergebnis1, ergebnis2, ergebn
 
     # Create new entry with calculated total score
     new_entry = {"Startnummer": next_startnummer, "Name": name, "Wertung": wertung, "Mannschaft": mannschaft,
-                "Status": status, "Ergebnis 1": ergebnis1, "Ergebnis 2": ergebnis2, "Ergebnis 3": ergebnis3,
-                "Gesamtergebnis": ergebnis1 + ergebnis2 + ergebnis3}
+                 "Status": status, "Ergebnis 1": ergebnis1, "Ergebnis 2": ergebnis2, "Ergebnis 3": ergebnis3}
 
     # Append new entry to DataFrame
     st.session_state.schuetzen_df = pd.concat([st.session_state.schuetzen_df, pd.DataFrame([new_entry])], ignore_index=True)
+
+    # Update Gesamtergebnis
+    update_gesamt_ergebnis()
 
     # Save DataFrame
     speichern()
@@ -50,6 +52,13 @@ def delete_schuetze(index):
     else:
         st.error("Ungültiger Index. Bitte geben Sie einen Index innerhalb des gültigen Bereichs ein.")
 
+# Funktion zum Aktualisieren des Gesamtergebnisses
+def update_gesamt_ergebnis():
+    st.session_state.schuetzen_df['Gesamtergebnis'] = st.session_state.schuetzen_df['Ergebnis 1'] + \
+                                                    st.session_state.schuetzen_df['Ergebnis 2'] + \
+                                                    st.session_state.schuetzen_df['Ergebnis 3']
+    speichern()
+
 # Benutzerinterface
 st.title("Schützenverwaltung")
 
@@ -62,11 +71,10 @@ with st.form("schuetze_anlegen"):
     ergebnis1 = st.number_input("Ergebnis 1")
     ergebnis2 = st.number_input("Ergebnis 2")
     ergebnis3 = st.number_input("Ergebnis 3")
-    gesamtergebnis = ergebnis1 + ergebnis2 + ergebnis3
     submitted = st.form_submit_button("Speichern")
 
 if submitted:
-    add_schuetze(name, wertung, mannschaft, status, ergebnis1, ergebnis2, ergebnis3, gesamtergebnis)
+    add_schuetze(name, wertung, mannschaft, status, ergebnis1, ergebnis2, ergebnis3)
 
 # Schützen bearbeiten
 edited_df = st.data_editor(
@@ -77,11 +85,11 @@ edited_df = st.data_editor(
         "Startnummer": st.column_config.NumberColumn("Startnummer", help="Eindeutige Startnummer", disabled=True),
         "Gesamtergebnis": st.column_config.NumberColumn("Gesamtergebnis", help="Summe der Ergebnisse", disabled=True),
         # ... other column configurations
-    }
+    },
+    on_change=update_gesamt_ergebnis
 )
 
 # Automatisches Speichern bei Änderungen
 if st.session_state.schuetzen_df is not None and not edited_df.equals(st.session_state.schuetzen_df):
     st.session_state.schuetzen_df = edited_df.copy()
     speichern()
-
