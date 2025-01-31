@@ -19,7 +19,6 @@ try:
         # Pandas DataFrame erstellen
         df = pd.DataFrame(sortierte_ergebnisse)
         df.insert(0, 'Platz', range(1, len(df) + 1))  # Platznummer hinzufügen
-
         df = df.drop(["wettkampf", "mitglieder"], axis=1)        # Streamlit-Tabelle anzeigen (Spalte "Mitglieder" wird nicht angezeigt)
         # Spalten umbenennen
         df = df.rename(columns={"mannschaft": "Mannschaft", "team_ergebnis": "Gesamtpunkte"})
