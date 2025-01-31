@@ -83,7 +83,7 @@ if st.button("Gesamtergebnis aktualisieren"):
 # Schützen bearbeiten
 edited_df = st.data_editor(
     st.session_state.schuetzen_df,
-    use_container_width=800,
+    use_container_width=1800,
     hide_index=True,
     column_config={
         "Startnummer": st.column_config.NumberColumn("Startnummer", help="Eindeutige Startnummer", disabled=True),
