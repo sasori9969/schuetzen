@@ -1,4 +1,2 @@
-Startnummer,Name,Wertung,Mannschaft,Status
-1,"Knapp, Gregor",Einzel,Feuerwehr,deaktivieren
-2,"Knapp, Lydia",Einzel,Feuerwehr,Aktiv
-3,"Knapp, Lydia",Einzel,Feuerwehr,deaktivieren
+Startnummer,Name,Wertung,Mannschaft,Status,Ergebnis 1,Ergebnis 2,Ergebnis 3,Gesamtergebnis
+1,"Knapp, Gregor",Team,Feuerwehr,Aktiv,158.0,0.0,0.0,0.0
