@@ -22,23 +22,11 @@ def add_schuetze(name, wertung, mannschaft):
     st.session_state.schuetzen_df = pd.concat([st.session_state.schuetzen_df, pd.DataFrame([new_entry])], ignore_index=True)
     speichern()
 
-# Funktion zum Löschen ausgewählter Schützen
-def loeschen():
-    ausgewaehlte_indices = edited_df[edited_df["Löschen"] == True].index  # Filter for True values only
-    if ausgewaehlte_indices.any():
-        if st.button("Bist du sicher?"):
-            # Debug-Ausgabe:
-            print(f"Zu löschende Indices: {ausgewaehlte_indices}")
+# Funktion zum Löschen eines Schützen
+def delete_schuetze(index):
+    st.session_state.schuetzen_df = st.session_state.schuetzen_df.drop(index)
+    speichern()
 
-            # Sicherstellen, dass inplace=False verwendet wird
-            st.session_state.schuetzen_df = st.session_state.schuetzen_df.drop(ausgewaehlte_indices, inplace=False)
-            speichern()
-            st.success("Schützen erfolgreich gelöscht.")
-            st.experimental_rerun()
-        else:
-            st.warning("Löschung abgebrochen.")
-    else:
-        st.warning("Bitte wähle mindestens einen Schützen zum Löschen aus.")
 st.header("Schützen anlegen")
 
 with st.form("schuetze_anlegen"):
@@ -59,15 +47,19 @@ edited_df = st.data_editor(
         "Name": st.column_config.TextColumn("Name", disabled=True),
         "Wertung": st.column_config.SelectboxColumn("Wertung", help="Wie startet der Schütze", options=["Einzel", "Team", "Einzel+Team"], required=True),
         "Mannschaft": st.column_config.TextColumn("Mannschaft", default="", help="Name der Mannschaft"),
-        "Löschen": st.column_config.CheckboxColumn("Löschen", default=False, help="Markiere die Schützen, die gelöscht werden sollen")
     }
 )
 
+# Neue Spalte für den Lösch-Button
+edited_df['Löschen'] = ''
+edited_df.Löschen = edited_df.index.to_series().apply(lambda x: st.button('Löschen', key=f'delete_{x}'))
+
+# Automatisches Löschen bei Button-Klick
+for index, row in edited_df.iterrows():
+    if row.Löschen:
+        delete_schuetze(index)
 
 # Automatisches Speichern bei Änderungen
 if st.session_state.schuetzen_df is not None and not edited_df.equals(st.session_state.schuetzen_df):
     st.session_state.schuetzen_df = edited_df.copy()
     speichern()
-
-if st.button("Schützen löschen"):
-    loeschen()
