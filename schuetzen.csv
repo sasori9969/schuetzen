@@ -1,3 +1,2 @@
-Startnummer,Name,Wertung,Mannschaft,Löschen
-1,"Knapp, Gregor",Einzel,Feuerwehr,True
-2,Rundenkampf,Einzel,Familie Knapp,False
+Startnummer,Name,Wertung,Mannschaft,Status
+1,"Knapp, Gregor",Einzel,Feuerwehr,deaktivieren

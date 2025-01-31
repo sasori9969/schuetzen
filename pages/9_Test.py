@@ -9,7 +9,7 @@ if "schuetzen_df" not in st.session_state:
     try:
         st.session_state.schuetzen_df = pd.read_csv("schuetzen.csv")
     except FileNotFoundError:
-        st.session_state.schuetzen_df = pd.DataFrame(columns=["Startnummer", "Name", "Wertung", "Mannschaft"])
+        st.session_state.schuetzen_df = pd.DataFrame(columns=["Startnummer", "Name", "Wertung", "Mannschaft", "Status"])
 
 # Funktion zum Speichern des DataFrames
 def speichern():
@@ -22,17 +22,13 @@ def add_schuetze(name, wertung, mannschaft):
     st.session_state.schuetzen_df = pd.concat([st.session_state.schuetzen_df, pd.DataFrame([new_entry])], ignore_index=True)
     speichern()
 
-# Funktion zum Löschen eines Schützen
-def delete_schuetze(index):
-    st.session_state.schuetzen_df = st.session_state.schuetzen_df.drop(index)
-    speichern()
-
 st.header("Schützen anlegen")
 
 with st.form("schuetze_anlegen"):
     name = st.text_input("Name des Schützen")
     wertung = st.selectbox("Wertung", ["Einzel", "Team", "Einzel+Team"])
     mannschaft = st.text_input("Mannschaft")
+    status = st.selectbox("Status", ["Aktiv", "deaktivieren"])
     submitted = st.form_submit_button("Speichern")
 
 if submitted:
@@ -47,17 +43,10 @@ edited_df = st.data_editor(
         "Name": st.column_config.TextColumn("Name", disabled=True),
         "Wertung": st.column_config.SelectboxColumn("Wertung", help="Wie startet der Schütze", options=["Einzel", "Team", "Einzel+Team"], required=True),
         "Mannschaft": st.column_config.TextColumn("Mannschaft", default="", help="Name der Mannschaft"),
+        "Status": st.column_config.SelectboxColumn("Status", help="Ist der Schütze Aktiv?", options=["Aktiv", "deaktivieren"], required=True),
+
     }
 )
-
-# Neue Spalte für den Lösch-Button
-edited_df['Löschen'] = ''
-edited_df.Löschen = edited_df.index.to_series().apply(lambda x: st.button('Löschen', key=f'delete_{x}'))
-
-# Automatisches Löschen bei Button-Klick
-for index, row in edited_df.iterrows():
-    if row.Löschen:
-        delete_schuetze(index)
 
 # Automatisches Speichern bei Änderungen
 if st.session_state.schuetzen_df is not None and not edited_df.equals(st.session_state.schuetzen_df):
