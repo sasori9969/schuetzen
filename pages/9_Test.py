@@ -58,23 +58,17 @@ def update_gesamt_ergebnis():
                                                     st.session_state.schuetzen_df['Ergebnis 2'] + \
                                                     st.session_state.schuetzen_df['Ergebnis 3']
     speichern()
+    st.success("Gesamtergebnis aktualisiert.")
 
 # Benutzerinterface
 st.title("Schützenverwaltung")
 
-# Schützen anlegen
-with st.form("schuetze_anlegen"):
-    name = st.text_input("Name des Schützen")
-    wertung = st.selectbox("Wertung", ["Einzel", "Team", "Einzel+Team"])
-    mannschaft = st.text_input("Mannschaft")
-    status = st.selectbox("Status", ["Aktiv", "deaktivieren"])
-    ergebnis1 = st.number_input("Ergebnis 1")
-    ergebnis2 = st.number_input("Ergebnis 2")
-    ergebnis3 = st.number_input("Ergebnis 3")
-    submitted = st.form_submit_button("Speichern")
+# Schützen anzeigen
+st.dataframe(st.session_state.schuetzen_df)
 
-if submitted:
-    add_schuetze(name, wertung, mannschaft, status, ergebnis1, ergebnis2, ergebnis3)
+# Button zum manuellen Aktualisieren
+if st.button("Gesamtergebnis aktualisieren"):
+    update_gesamt_ergebnis()
 
 # Schützen bearbeiten
 edited_df = st.data_editor(
