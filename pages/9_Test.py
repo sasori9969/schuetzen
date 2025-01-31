@@ -16,9 +16,9 @@ def speichern():
     st.session_state.schuetzen_df.to_csv("schuetzen.csv", index=False)
 
 # Funktion zum Hinzufügen eines Schützen
-def add_schuetze(name, wertung, mannschaft):
+def add_schuetze(name, wertung, mannschaft, status):
     next_startnummer = st.session_state.schuetzen_df['Startnummer'].max() + 1 if not st.session_state.schuetzen_df.empty else 1
-    new_entry = {"Startnummer": next_startnummer, "Name": name, "Wertung": wertung, "Mannschaft": mannschaft}
+    new_entry = {"Startnummer": next_startnummer, "Name": name, "Wertung": wertung, "Mannschaft": mannschaft, "Status": status}
     st.session_state.schuetzen_df = pd.concat([st.session_state.schuetzen_df, pd.DataFrame([new_entry])], ignore_index=True)
     speichern()
 
@@ -32,7 +32,7 @@ with st.form("schuetze_anlegen"):
     submitted = st.form_submit_button("Speichern")
 
 if submitted:
-    add_schuetze(name, wertung, mannschaft)
+    add_schuetze(name, wertung, mannschaft, status)
 
 edited_df = st.data_editor(
     st.session_state.schuetzen_df,
