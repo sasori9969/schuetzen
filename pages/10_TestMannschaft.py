@@ -6,7 +6,7 @@ import pandas as pd
 st.title("Mannschaftsergebnisse")
 
 # Pfad zur JSON-Datei im Hauptverzeichnis
-ergebnisse_datei = "ergebnisse.json"  # Direkt im Hauptverzeichnis
+ergebnisse_datei = "ergebnisse.json" # Direkt im Hauptverzeichnis
 
 try:
     if os.path.exists(ergebnisse_datei):
@@ -16,16 +16,14 @@ try:
         # Sortieren der Ergebnisse absteigend nach Team-Ergebnis
         sortierte_ergebnisse = sorted(ergebnisse, key=lambda x: x["team_ergebnis"], reverse=True)
 
-        # Streamlit-Tabelle erstellen mit Platznummerierung
-        data = []
-        for i, eintrag in enumerate(sortierte_ergebnisse):  # enumerate für den Index
-            data.append({
-                "Platz": i + 1,  # Platznummer (beginnend mit 1)
-                "Mannschaft": eintrag["mannschaft"],
-                "Team Ergebnis": eintrag["team_ergebnis"]
-            })
-        st.dataframe(data, column_config={"Platz": st.column_config.Column(label="Platz", width=50)}, hide_index=True)
+        # Pandas DataFrame erstellen
+        df = pd.DataFrame(sortierte_ergebnisse)
+        df.insert(0, 'Platz', range(1, len(df) + 1))  # Platznummer hinzufügen
 
+        df = df.drop(["wettkampf", "mitglieder"], axis=1)        # Streamlit-Tabelle anzeigen (Spalte "Mitglieder" wird nicht angezeigt)
+        # Spalten umbenennen
+        df = df.rename(columns={"mannschaft": "Mannschaft", "team_ergebnis": "Gesamtpunkte"})
+        st.dataframe(df, use_container_width=True, hide_index=True)
     else:
         st.write("Noch keine Ergebnisse vorhanden.")
 
