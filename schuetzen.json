@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "name": "Knapp",
+        "vorname": "Gregor"
+    },
+    {
+        "name": "Knapp",
+        "vorname": "Lydia"
+    },
+    {
+        "name": "Knapp",
+        "vorname": "Constantin"
+    }
+]

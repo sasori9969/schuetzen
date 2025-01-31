@@ -1,1 +1,40 @@
-[]
+[
+    {
+        "wettkampf": "Ostern",
+        "mannschaft": "Familie",
+        "mitglieder": [
+            {
+                "mitglied": "Gregor Knapp",
+                "punkte": 200
+            },
+            {
+                "mitglied": "Lydia Knapp",
+                "punkte": 190
+            },
+            {
+                "mitglied": "Constantin Knapp",
+                "punkte": 151
+            }
+        ],
+        "team_ergebnis": 541
+    },
+    {
+        "wettkampf": "Ostern",
+        "mannschaft": "Feuer",
+        "mitglieder": [
+            {
+                "mitglied": "Gregor Knapp",
+                "punkte": 190
+            },
+            {
+                "mitglied": "Lydia Knapp",
+                "punkte": 100
+            },
+            {
+                "mitglied": "Constantin Knapp",
+                "punkte": 100
+            }
+        ],
+        "team_ergebnis": 390
+    }
+]
